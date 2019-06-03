@@ -18,9 +18,11 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       height: {
+        allowNull: true,
         type: Sequelize.INTEGER
       },
       weight: {
+        allowNull: true,
         type: Sequelize.INTEGER
       },
       team: {
