@@ -4,6 +4,7 @@ const Olympian = require('./../models').Olympian
 const Event = require('./../models').Event
 const pry = require('pryjs')
 const sequelize = require('sequelize');
+const Op = sequelize.Op;
 
 
 router.get('/olympians', async function(req, res, next) {
@@ -94,11 +95,35 @@ router.get('/events', async function(req, res, next){
     const events = await Event.findAll({
       attributes: [
         'sport',
-        [sequelize.fn('array_agg', sequelize.col('name')), 'events']  
+        [sequelize.fn('array_agg', sequelize.col('name')), 'events']
       ],
       group: ['Event.sport']
     });
     res.status(200).send({ events });
+  } catch (error) {
+    res.status(404).send({ error });
+  }
+});
+
+router.get('/events/:id/medalists', async function(req, res, next){
+  res.setHeader('Content-Type', 'application/json');
+  try {
+
+    const idEvent = await Event.findOne({
+      where: { id: req.params.id }
+    });
+
+    const medalists = await Olympian.findAll({
+      attributes: [
+        'name',
+        'age',
+        'team',
+        'medal'
+      ],
+      where: { sport: idEvent.sport, medal: { [Op.ne]: null } }
+    });
+
+    res.status(200).send({ sport: idEvent.sport, medalists: medalists });
   } catch (error) {
     res.status(404).send({ error });
   }
