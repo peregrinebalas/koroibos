@@ -1,11 +1,13 @@
 var express = require('express');
 var router = express.Router();
 const Olympian = require('./../models').Olympian
+const Event = require('./../models').Event
 const pry = require('pryjs')
 const sequelize = require('sequelize');
 
 
 router.get('/olympians', async function(req, res, next) {
+  res.setHeader('Content-Type', 'application/json');
   try {
     let olymps = null;
     if (req.query.age) {
@@ -30,15 +32,14 @@ router.get('/olympians', async function(req, res, next) {
         group: ['Olympian.sport', 'Olympian.team', 'Olympian.age', 'Olympian.name']
       });
     }
-    res.setHeader('Content-Type', 'application/json');
     res.status(200).send(JSON.stringify({olympians: olymps}));
   } catch (error) {
-    res.setHeader('Content-Type', 'application/json');
     res.status(404).send(JSON.stringify(error));
   }
 });
 
 router.get('/olympian_stats', async function(req, res, next){
+  res.setHeader('Content-Type', 'application/json');
   try {
     // SELECT COUNT("Olympians"."name") FROM "Olympians" GROUP BY "Olympians"."team", "Olympians"."name";
     const olymps = await Olympian.findAll({
@@ -71,7 +72,6 @@ router.get('/olympian_stats', async function(req, res, next){
     });
     const femaleWt = avgFemale[0].dataValues.f_olymps;
 
-    res.setHeader('Content-Type', 'application/json');
     res.status(200).send(JSON.stringify({
       olympian_stats: {
         total_competing_olympians: olymps.length,
@@ -84,17 +84,24 @@ router.get('/olympian_stats', async function(req, res, next){
       }
     }));
   } catch (error) {
-    res.setHeader('Content-Type', 'application/json');
     res.status(404).send(JSON.stringify(error));
   }
 });
 
-router.get('events', async function(req, res, next){
+router.get('/events', async function(req, res, next){
+  res.setHeader('Content-Type', 'application/json');
   try {
-
-  } catch {
-
-  }  
+    const events = await Event.findAll({
+      attributes: [
+        'sport',
+        [sequelize.fn('array_agg', sequelize.col('name')), 'events']  
+      ],
+      group: ['Event.sport']
+    });
+    res.status(200).send({ events });
+  } catch (error) {
+    res.status(404).send({ error });
+  }
 });
 
 module.exports = router;
