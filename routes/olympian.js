@@ -89,4 +89,12 @@ router.get('/olympian_stats', async function(req, res, next){
   }
 });
 
+router.get('events', async function(req, res, next){
+  try {
+
+  } catch {
+
+  }  
+});
+
 module.exports = router;
