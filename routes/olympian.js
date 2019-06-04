@@ -42,7 +42,6 @@ router.get('/olympians', async function(req, res, next) {
 router.get('/olympian_stats', async function(req, res, next){
   res.setHeader('Content-Type', 'application/json');
   try {
-    // SELECT COUNT("Olympians"."name") FROM "Olympians" GROUP BY "Olympians"."team", "Olympians"."name";
     const olymps = await Olympian.findAll({
       attributes: [
         [sequelize.fn('COUNT', sequelize.col('name')), 'tots_olymps']
@@ -120,10 +119,10 @@ router.get('/events/:id/medalists', async function(req, res, next){
         'team',
         'medal'
       ],
-      where: { sport: idEvent.sport, medal: { [Op.ne]: null } }
+      where: { event: idEvent.name, medal: { [Op.ne]: null } }
     });
 
-    res.status(200).send({ sport: idEvent.sport, medalists: medalists });
+    res.status(200).send({ event: idEvent.name, medalists: medalists });
   } catch (error) {
     res.status(404).send({ error });
   }
