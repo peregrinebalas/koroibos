@@ -11,7 +11,7 @@ run the following commands in your terminal:
 $ npm install
 $ npx sequelize db:create
 $ npx sequelize db:migrate
-$ node csv_parser.js
+$ node csv_parse.js
 ```
 
 ### Versions
